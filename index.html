@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Прогрессиялар · 9-сынып</title>
+<style>
+:root{--bg:#f5f7fc;--tx:#14213d;--bl:#2f5bff;--go:#f2b400;--dk:#14213d;--lt:#e9eefb;--gr:#1f9d5a;--rd:#d93a3a;--card:#fff;--mut:#5a6785}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.6 system-ui,sans-serif}
+h1,h2,h3{margin:0 0 .5em;line-height:1.2}
+h1{font-size:clamp(2rem,6vw,3.2rem)}
+h2{font-size:1.7rem}
+nav{position:sticky;top:0;background:var(--dk);display:flex;gap:4px;overflow-x:auto;padding:6px 10px;z-index:5}
+nav a{color:#fff;text-decoration:none;padding:6px 14px;border-radius:6px;white-space:nowrap}
+nav a:hover{background:var(--bl)}
+main{max-width:880px;margin:0 auto;padding:0 16px}
+section{padding:34px 0}
+.card{background:var(--card);border:2px solid var(--dk);border-radius:12px;padding:16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.grid .card{margin:0}
+.f{font-family:Georgia,serif;font-size:1.15em;background:#fff3c4;padding:1px 8px;border-radius:4px}
+button{font:inherit;cursor:pointer;border:2px solid var(--dk);background:var(--bl);color:#fff;font-weight:700;border-radius:8px;padding:8px 16px}
+button:hover{filter:brightness(1.12)}
+button.alt{background:var(--card);color:var(--dk)}
+button.on{background:var(--go);color:var(--dk)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--go);outline-offset:2px}
+input[type=text],select{font:inherit;border:2px solid var(--dk);border-radius:8px;padding:8px 10px;background:#fff;color:var(--tx)}
+input[type=text]{width:170px}
+input[type=range]{accent-color:var(--bl)}
+/* тақта */
+#board{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,420px);aspect-ratio:1;border:3px solid var(--dk);margin:12px 0}
+#board i{background:#fff;transition:background .3s,transform .3s}
+#board i:nth-child(odd){background:#cfd8ee}
+#board i.on{background:var(--go)}
+#board i.cur{background:var(--bl);transform:scale(1.15);z-index:1}
+.big{font-family:Georgia,serif;font-size:clamp(1.1rem,4.5vw,1.8rem);font-weight:700;word-break:break-all}
+.sl label{display:flex;align-items:center;gap:10px;margin:6px 0}
+.sl input{flex:1}
+.sl b{min-width:2.8em}
+/* бағандар */
+#bars,#lab{display:flex;gap:6px}
+#bars{height:220px;align-items:flex-end;border-bottom:3px solid var(--dk)}
+.pair{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;transition:opacity .3s}
+.pair i{flex:1;display:block;transition:height .5s;min-height:2px}
+.ba{background:var(--bl)}.bg{background:var(--go)}
+#lab span{flex:1;text-align:center;font-size:.8rem;color:var(--mut)}
+.leg span{display:inline-block;width:12px;height:12px;margin:0 4px 0 12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.task{border:2px solid var(--dk);border-radius:10px;padding:12px 14px;margin:10px 0;background:var(--card)}
+.task.done{border-color:var(--gr);background:#ecfaf2}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.r{min-height:1.5em;margin:6px 0;font-weight:600}
+details{color:var(--mut)}summary{cursor:pointer}
+.bar{height:12px;background:#d3dbef;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gr);transition:width .5s}
+.xp{font-size:1.3rem;font-weight:700}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:no-preference){.pop{animation:pop .5s}.shake{animation:shake .3s}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<nav><a href="#hero">Аңыз</a><a href="#teoriya">Теория</a><a href="#salys">Салыстыру</a><a href="#esep">Деңгейлік есептер</a><a href="#oyin">Ойын</a></nav>
+<main>
+
+<section id="hero">
+<h1>Шахмат тақтасындағы бидай</h1>
+<p>Аңыз бойынша шахмат ойлап тапқан данышпан сыйлыққа бидай сұрайды: 1-ші шаршыға 1 дән, 2-шіге 2, 3-шіге 4, әр келесісіне алдыңғысынан екі есе көп. Бұл — геометриялық прогрессия. Жүгірткіні жылжытыңыз.</p>
+<div class="card">
+<div class="sl"><label>Шаршы нөмірі n = <b id="nv">1</b> <input type="range" id="cn" min="1" max="64" value="1"></label></div>
+<div id="board"></div>
+<p>n-ші шаршыдағы дән: <span class="big" id="g1"></span></p>
+<p>1-ден n-ге дейінгі барлығы: <span class="big" id="g2"></span></p>
+<p id="g3"></p>
+<button id="play">Бидай салу</button>
+<p class="f">bₙ = 2ⁿ⁻¹ &nbsp; Sₙ = 2ⁿ − 1</p>
+</div>
+</section>
+
+<section id="teoriya">
+<h2>Теория</h2>
+<div class="grid">
+<div class="card"><h3>Арифметикалық прогрессия</h3><p>Әр мүше алдыңғысына бірдей d санын қосқаннан шығады.</p><p><span class="f">aₙ = a₁ + (n − 1)d</span></p><p><span class="f">Sₙ = (a₁ + aₙ)·n / 2</span></p><p>Мысал: 3, 7, 11, 15, … (d = 4)</p></div>
+<div class="card"><h3>Геометриялық прогрессия</h3><p>Әр мүше алдыңғысын бірдей q санына көбейткеннен шығады.</p><p><span class="f">bₙ = b₁·qⁿ⁻¹</span></p><p><span class="f">Sₙ = b₁(qⁿ − 1) / (q − 1)</span></p><p>Мысал: 2, 6, 18, 54, … (q = 3)</p></div>
+</div>
+<div class="card">
+<h3>Гаусс әдісі: 1 + 2 + … + 100</h3>
+<p>Кішкентай Гаусс қосындыны шетінен жұптап есептеген екен. Басып көріңіз.</p>
+<button id="gb">Гаусс әдісі</button>
+<div id="gl"></div>
+</div>
+<div class="card" style="border-color:var(--rd)">
+<p><b>Қалай ажыратамыз?</b> Көршілес мүшелердің <b>айырмасы</b> тұрақты болса, арифметикалық. <b>Қатынасы</b> тұрақты болса, геометриялық.</p>
+</div>
+</section>
+
+<section id="salys">
+<h2>Екі өсу жолы</h2>
+<p>Екі жинақ та бірдей санмен басталады. Біріншісі әр қадамда d санына артады, екіншісі q есе көбейеді.</p>
+<div class="card">
+<div class="sl">
+<label>Бастапқы сан <b id="v1">5</b> <input type="range" id="s1" min="1" max="10" value="5"></label>
+<label>d (қосылатыны) <b id="v2">10</b> <input type="range" id="s2" min="1" max="20" value="10"></label>
+<label>q (көбейтетіні) <b id="v3">1.5</b> <input type="range" id="s3" min="1.1" max="2" step="0.1" value="1.5"></label>
+<label>Мүше саны n <b id="v4">8</b> <input type="range" id="s4" min="3" max="12" value="8"></label>
+</div>
+<div id="bars"></div><div id="lab"></div>
+<p class="leg"><span style="background:var(--bl)"></span>арифметикалық <span style="background:var(--go)"></span>геометриялық</p>
+<p id="res"></p>
+</div>
+</section>
+
+<section id="esep">
+<h2>Деңгейлік есептер</h2>
+<p>Жауапты сан етіп жазыңыз. Бөлшек: 1/2 немесе 0.5.</p>
+<p class="xp">Ұпай: <span id="xp">0</span></p>
+<div class="bar"><i id="pb"></i></div>
+<div class="tabs" id="tabs">
+<button class="alt" onclick="lvl(0)">1-деңгей</button>
+<button class="alt" onclick="lvl(1)">2-деңгей</button>
+<button class="alt" onclick="lvl(2)">3-деңгей</button>
+</div>
+<div id="tl"></div>
+<p class="r" id="fin"></p>
+</section>
+
+<section id="oyin">
+<h2>Ойын: заңдылықты тап</h2>
+<div class="card">
+<p>Раунд <b id="rd">1</b> / 10 · Ұпай <b id="gs">0</b> · Қатар жауап <b id="st">0</b></p>
+<p class="big" id="sq"></p>
+<p class="row"><select id="gt" aria-label="Прогрессия түрі"><option value="a">Арифметикалық</option><option value="g">Геометриялық</option></select>
+<input type="text" id="gi" inputmode="numeric" placeholder="келесі мүше"> <button id="gk">Тексеру</button></p>
+<p class="r" id="gr" aria-live="polite"></p>
+</div>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const sp=x=>String(x).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+
+/* Шахмат тақтасы */
+for(let i=0;i<64;i++)$('board').insertAdjacentHTML('beforeend','<i></i>');
+function board(){
+  const n=+$('cn').value;$('nv').textContent=n;
+  [...$('board').children].forEach((e,i)=>{e.classList.toggle('on',i<n-1);e.classList.toggle('cur',i===n-1)});
+  const b=BigInt(n);
+  $('g1').textContent=sp(String(1n<<(b-1n)));
+  $('g2').textContent=sp(String((1n<<b)-1n));
+  $('g3').textContent=n>=40?'Сан өте үлкен: мұншама дәнді санап шығу мүмкін емес!':n>=20?'Бір миллионнан асып кетті.':'';
+}
+$('cn').oninput=board;board();
+let pl=null;
+$('play').onclick=()=>{
+  clearInterval(pl);let k=1;$('cn').value=1;board();
+  pl=setInterval(()=>{k++;$('cn').value=k;board();if(k>=64)clearInterval(pl)},110);
+};
+
+/* Гаусс */
+let gv=null;
+$('gb').onclick=()=>{
+  clearInterval(gv);const o=$('gl');o.innerHTML='';let k=1;
+  gv=setInterval(()=>{
+    if(k>5){clearInterval(gv);o.insertAdjacentHTML('beforeend','<p class="pop">… барлығы 50 жұп: 50 × 101 = <b>5050</b></p>');return}
+    o.insertAdjacentHTML('beforeend','<p class="pop">'+k+' + '+(101-k)+' = 101</p>');k++;
+  },550);
+};
+
+/* Салыстыру */
+const BN=12;
+for(let i=0;i<BN;i++){
+  $('bars').insertAdjacentHTML('beforeend','<div class="pair"><i class="ba"></i><i class="bg"></i></div>');
+  $('lab').insertAdjacentHTML('beforeend','<span>'+(i+1)+'</span>');
+}
+const fm=x=>sp(Math.round(x*100)/100);
+function cmp(){
+  const a=+$('s1').value,d=+$('s2').value,q=+$('s3').value,n=+$('s4').value;
+  $('v1').textContent=a;$('v2').textContent=d;$('v3').textContent=q;$('v4').textContent=n;
+  const A=[],G=[];for(let i=0;i<BN;i++){A.push(a+i*d);G.push(a*Math.pow(q,i))}
+  const m=Math.max(A[n-1],G[n-1]);
+  [...$('bars').children].forEach((p,i)=>{
+    p.style.opacity=i<n?1:.15;
+    p.children[0].style.height=(i<n?A[i]/m*100:0)+'%';
+    p.children[1].style.height=(i<n?G[i]/m*100:0)+'%';
+  });
+  const Sa=(a+A[n-1])*n/2,Sg=a*(Math.pow(q,n)-1)/(q-1);
+  $('res').innerHTML='<b>Арифметикалық:</b> aₙ = '+fm(A[n-1])+', Sₙ = '+fm(Sa)+'<br><b>Геометриялық:</b> bₙ = '+fm(G[n-1])+', Sₙ = '+fm(Sg)+'<br>'+(G[n-1]>A[n-1]?'Геометриялық өсу озып кетті.':'Әзірге арифметикалық өсу алда. n-ді үлкейтіп көріңіз.');
+}
+['s1','s2','s3','s4'].forEach(i=>$(i).oninput=cmp);cmp();
+
+/* Деңгейлік есептер */
+const parse=s=>s.toLowerCase().replace(/,\s+/g,' ').replace(/,/g,'.').split(/[\s;]+/).filter(Boolean).map(t=>t.includes('/')?t.split('/').reduce((x,y)=>x/y):+t.replace('−','-'));
+const ok=(t,v)=>{const x=parse(v).sort((p,q)=>p-q),y=t.a.slice().sort((p,q)=>p-q);return x.length===y.length&&x.every((n,i)=>Math.abs(n-y[i])<1e-6)};
+const L=[[
+{q:'4, 7, 10, 13, … прогрессиясының 5-ші мүшесін табыңыз.',a:[16],h:'d = 3. a₅ = 13 + 3.'},
+{q:'2, 6, 18, … прогрессиясының q бөлгішін табыңыз.',a:[3],h:'q = 6 : 2.'},
+{q:'a₁ = 5, d = 2 болса, a₁₀ неге тең?',a:[23],h:'a₁₀ = 5 + 9·2.'}
+],[
+{q:'a₁ = 3, d = 4. Алғашқы 10 мүшенің қосындысы S₁₀ неге тең?',a:[210],h:'a₁₀ = 3 + 36 = 39. S₁₀ = (3 + 39)·10/2.'},
+{q:'b₁ = 2, q = 2. b₇ неге тең?',a:[128],h:'b₇ = 2·2⁶.'},
+{q:'Арифметикалық прогрессияда a₇ = 20, a₁₀ = 29. d табыңыз.',a:[3],h:'a₁₀ − a₇ = 3d.'}
+],[
+{q:'3 + 6 + 9 + … + 300 қосындысын табыңыз.',a:[15150],h:'3-тің еселері: n = 100, S = (3 + 300)·100/2.'},
+{q:'Геометриялық прогрессияда b₂ = 6, b₄ = 54, q &gt; 0. q табыңыз.',a:[3],h:'b₄ / b₂ = q². q² = 9.'},
+{q:'Оқушы 1-ші күні 10 бет оқыды, әр келесі күні 2 беттен артық оқиды. 7 күнде барлығы неше бет?',a:[112],h:'a₁ = 10, d = 2, a₇ = 22. S₇ = (10 + 22)·7/2.'},
+{q:'Басында 3 бактерия бар, олар әр сағатта екі есе көбейеді. 6 сағаттан кейін неше бактерия болады?',a:[192],h:'Геометриялық: 3·2⁶.'}
+]];
+let xp=0;const dn={};
+const total=L.reduce((s,l)=>s+l.length,0);
+function upd2(){
+  $('xp').textContent=xp;const n=Object.keys(dn).length;
+  $('pb').style.width=n/total*100+'%';
+  $('fin').textContent=n===total?'Барлық деңгей аяқталды! Жарайсың!':'';
+}
+function lvl(i){
+  [...$('tabs').children].forEach((b,j)=>b.classList.toggle('on',i===j));
+  $('tl').innerHTML='';
+  L[i].forEach((t,k)=>{
+    const id=i+'-'+k,d=document.createElement('div');
+    d.className='task'+(dn[id]?' done':'');
+    d.innerHTML='<p>'+(k+1)+'. '+t.q+'</p><div class="row"><input type="text" inputmode="decimal" aria-label="Жауап"><button>Тексеру</button></div><p class="r"></p><details><summary>Көмек</summary><p>'+t.h+'</p></details>';
+    const inp=d.querySelector('input'),r=d.querySelector('.r');
+    if(dn[id]){inp.value=dn[id];inp.disabled=true;r.textContent='Дұрыс!'}
+    const go=()=>{
+      if(dn[id])return;
+      if(ok(t,inp.value)){dn[id]=inp.value;xp+=(i+1)*10;d.classList.add('done','pop');inp.disabled=true;r.textContent='Дұрыс! +'+(i+1)*10+' ұпай';upd2()}
+      else{r.textContent='Әлі емес. «Көмек» бөлімін ашып көріңіз.';d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake')}
+    };
+    d.querySelector('button').onclick=go;
+    inp.onkeydown=e=>{if(e.key==='Enter')go()};
+    $('tl').appendChild(d);
+  });
+}
+lvl(0);
+
+/* Ойын */
+let rd=1,gs=0,st=0,ans=0,ty='a',info='',lock=false;
+function seq(){
+  const t=[],R=n=>Math.floor(Math.random()*n);
+  if(Math.random()<.5){
+    const b=1+R(3),q=2+R(2);for(let i=0;i<5;i++)t.push(b*Math.pow(q,i));ty='g';info='геометриялық, q = '+q;
+  }else{
+    const a=R(20)-5,d=[-4,-3,-2,2,3,4,5,7][R(8)];for(let i=0;i<5;i++)t.push(a+i*d);ty='a';info='арифметикалық, d = '+d;
+  }
+  ans=t[4];$('sq').textContent=t.slice(0,4).join(', ')+', …';
+  $('gi').value='';$('rd').textContent=rd;lock=false;
+}
+function chk(){
+  if(lock)return;
+  const good=+$('gi').value.replace(',','.')===ans&&$('gt').value===ty;
+  if(good){gs++;st++;$('gr').textContent='Дұрыс! '+info+', келесі мүше '+ans}
+  else{st=0;$('gr').textContent='Жауап: '+info+', келесі мүше '+ans}
+  $('gs').textContent=gs;$('st').textContent=st;lock=true;
+  if(rd===10){$('gr').textContent+=' · Ойын біттi. Ұпай: '+gs+' / 10. Қайта бастау үшін бетті жаңартыңыз.';return}
+  rd++;setTimeout(()=>{$('gr').textContent='';seq()},1800);
+}
+$('gk').onclick=chk;$('gi').onkeydown=e=>{if(e.key==='Enter')chk()};
+seq();
+</script>
+</body>
+</html>
